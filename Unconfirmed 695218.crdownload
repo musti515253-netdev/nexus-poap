@@ -1,0 +1,41 @@
+# =============================================================
+# Cisco Nexus 3K — Switch Config Template
+# POAP Auto Provisioning Config
+# Red Hat Linux TFTP Server: 192.168.1.100
+# =============================================================
+# RULES:
+#   1. No 'version x.x.x' line at the top
+#   2. Must have: no boot poap enable
+#   3. Boot image path must match actual .bin on bootflash
+#   4. Remove unsupported features for your NX-OS version
+#   5. Last line MUST be: copy running-config startup-config
+# =============================================================
+
+hostname YOUR-SWITCH-HOSTNAME
+
+no boot poap enable
+boot nxos bootflash:/nxos.7.0.3.I7.6.bin
+
+feature ssh
+feature telnet
+feature interface-vlan
+feature lldp
+
+username admin password YourPasswordHere role network-admin
+
+interface mgmt0
+  ip address 192.168.1.10/24
+  no shutdown
+
+vrf context management
+  ip route 0.0.0.0/0 192.168.1.1
+
+vlan 10
+  name Production
+vlan 20
+  name Management
+
+logging server 192.168.1.100 5 use-vrf management
+ntp server 192.168.1.100 use-vrf management
+
+copy running-config startup-config
